@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${isEdit} ? 'Edit Country' : 'Add Country'">Country Form</title>
+</head>
+<body>
+
+<h1 th:text="${isEdit} ? 'Edit Country' : 'Add Country'">Country Form</h1>
+
+<form th:action="${isEdit}
+        ? @{/countries/{id}/update(id=${country.countryId})}
+        : @{/countries}"
+      th:object="${country}"
+      method="post">
+
+    <div>
+        <label>Country ID
+            <input th:field="*{countryId}"
+                   th:readonly="${isEdit}"
+                   placeholder="e.g. US (letters only, max 4)"/>
+            <span th:if="${#fields.hasErrors('countryId')}"
+                  th:errors="*{countryId}"
+                  style="color:red"></span>
+        </label>
+    </div>
+
+    <div>
+        <label>Country Name
+            <input th:field="*{countryName}" placeholder="e.g. United States"/>
+            <span th:if="${#fields.hasErrors('countryName')}"
+                  th:errors="*{countryName}"
+                  style="color:red"></span>
+        </label>
+    </div>
+
+    <div>
+        <label>Region
+            <select th:field="*{regionId}">
+                <option value="">-- Select Region --</option>
+                <option th:each="r : ${regions}"
+                        th:value="${r['regionId']}"
+                        th:text="${r['regionName']}"></option>
+            </select>
+            <span th:if="${#fields.hasErrors('regionId')}"
+                  th:errors="*{regionId}"
+                  style="color:red"></span>
+        </label>
+    </div>
+
+    <button type="submit" th:text="${isEdit} ? 'Update Country' : 'Add Country'">Submit</button>
+    <a href="/countries">Cancel</a>
+
+</form>
+
+</body>
+</html>

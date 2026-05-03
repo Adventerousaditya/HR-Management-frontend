@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Countries</title>
+</head>
+<body>
+
+<h1>Countries</h1>
+
+<div th:if="${message}" style="color:green;padding:8px" th:text="${message}"></div>
+
+<a href="/countries/new">+ Add Country</a>
+
+<table>
+    <thead>
+        <tr>
+            <th>Country ID</th>
+            <th>Country Name</th>
+            <th>Region</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+		<tr th:each="c : ${countries}"
+		    th:onclick="|window.location='@{/countries/{id}(id=${c['countryId']})}'|"
+		    style="cursor:pointer">
+            <td th:text="${c['countryId']}"></td>
+            <td th:text="${c['countryName']}"></td>
+            <td th:text="${c['region'] != null ? c['region']['regionName'] : ''}"></td>
+            <td>
+                <a th:href="@{/countries/{id}/edit(id=${c['countryId']})}"
+                   onclick="event.stopPropagation()">Edit</a>
+            </td>
+        </tr>
+    </tbody>
+	
+</table>
+<div style="margin-top:12px">
+	    <a th:if="${currentPage > 0}"
+	       th:href="@{/countries(page=${currentPage - 1})}">← Prev</a>
+
+	    <span th:text="'Page ' + (${currentPage + 1}) + ' of ' + ${totalPages}"
+	          style="margin: 0 12px"></span>
+
+	    <a th:if="${currentPage + 1 < totalPages}"
+	       th:href="@{/countries(page=${currentPage + 1})}">Next →</a>
+	</div>
+
+
+</body>
+</html>
