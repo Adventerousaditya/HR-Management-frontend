@@ -10,79 +10,72 @@
 
 <header>
     <h1>HR Management</h1>
+    <p class="header-note">Team modules</p>
 </header>
 
 <main>
-    <h2>Our Team</h2>
+    <h2>Choose a master table</h2>
 
     <div class="grid">
-
-        <!-- Card 1 — You → Countries -->
-        <div class="card">
-            <img th:src="@{/images/photo1.jpg}" alt="Your photo" />
+        <a th:href="@{/employees}" class="card card--primary">
+            <img th:src="@{/images/team-employee.svg}" alt="Employee module owner" />
             <div class="card-body">
-                <span class="card-name">You</span>
+                <span class="card-name">My Module</span>
+                <span class="card-role">Employees and Managers</span>
+                <span class="card-link">Open Managers</span>
+            </div>
+        </a>
+
+        <a th:href="@{/countries}" class="card">
+            <img th:src="@{/images/team-country.svg}" alt="Countries module owner" />
+            <div class="card-body">
+                <span class="card-name">Team Member 2</span>
                 <span class="card-role">Countries</span>
-                <a th:href="@{/countries}" class="card-link">View Table</a>
+                <span class="card-link">View Table</span>
             </div>
-        </div>
+        </a>
 
-        <!-- Card 2 — TM 2 → Regions -->
-        <div class="card">
-            <img th:src="@{/images/photo2.jpg}" alt="TM 2 photo" />
+        <a th:href="@{/regions}" class="card">
+            <img th:src="@{/images/team-region.svg}" alt="Regions module owner" />
             <div class="card-body">
-                <span class="card-name">TM 2</span>
+                <span class="card-name">Team Member 3</span>
                 <span class="card-role">Regions</span>
-                <a th:href="@{/regions}" class="card-link">View Table</a>
+                <span class="card-link">View Table</span>
             </div>
-        </div>
+        </a>
 
-        <!-- Card 3 — TM 3 → Locations -->
-        <div class="card">
-            <img th:src="@{/images/photo3.jpg}" alt="TM 3 photo" />
+        <a th:href="@{/locations}" class="card">
+            <img th:src="@{/images/team-location.svg}" alt="Locations module owner" />
             <div class="card-body">
-                <span class="card-name">TM 3</span>
+                <span class="card-name">Team Member 4</span>
                 <span class="card-role">Locations</span>
-                <a th:href="@{/locations}" class="card-link">View Table</a>
+                <span class="card-link">View Table</span>
             </div>
-        </div>
+        </a>
 
-        <!-- Card 4 — TM 4 → Departments -->
-        <div class="card">
-            <img th:src="@{/images/photo4.jpg}" alt="TM 4 photo" />
+        <a th:href="@{/departments}" class="card">
+            <img th:src="@{/images/team-department.svg}" alt="Departments module owner" />
             <div class="card-body">
-                <span class="card-name">TM 4</span>
+                <span class="card-name">Team Member 5</span>
                 <span class="card-role">Departments</span>
-                <a th:href="@{/departments}" class="card-link">View Table</a>
+                <span class="card-link">View Table</span>
             </div>
-        </div>
+        </a>
 
-        <!-- Card 5 — TM 5 → Employees -->
-        <div class="card">
-            <img th:src="@{/images/photo5.jpg}" alt="TM 5 photo" />
+        <a th:href="@{/jobs}" class="card">
+            <img th:src="@{/images/team-job.svg}" alt="Jobs module owner" />
             <div class="card-body">
-                <span class="card-name">TM 5</span>
-                <span class="card-role">Employees</span>
-                <a th:href="@{/employees}" class="card-link">View Table</a>
-            </div>
-        </div>
-
-        <!-- Card 6 — TM 6 → Jobs -->
-        <div class="card">
-            <img th:src="@{/images/photo6.jpg}" alt="TM 6 photo" />
-            <div class="card-body">
-                <span class="card-name">TM 6</span>
+                <span class="card-name">Team Member 6</span>
                 <span class="card-role">Jobs</span>
-                <a th:href="@{/jobs}" class="card-link">View Table</a>
+                <span class="card-link">View Table</span>
             </div>
-        </div>
-
+        </a>
     </div>
 </main>
 
 <footer>
     <span>HR Management Portal</span>
-    <span>Phase 2 — Home Page</span>
+    <span>Employee module: Managers, direct reports, hierarchy</span>
 </footer>
 
 </body>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="'Manager Detail - ' + ${manager != null ? manager.fullName : managerId}">Manager Detail</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="stylesheet" th:href="@{/css/employees.css}" />
+</head>
+<body class="emp-page">
+
+<header class="emp-header">
+    <a th:href="@{/employees}" class="back-link">Managers</a>
+    <div>
+        <h1 th:text="${manager != null ? manager.fullName : 'Manager Detail'}">Manager Detail</h1>
+        <p class="header-note">Direct reports and reporting hierarchy</p>
+    </div>
+    <span class="emp-badge">Page 3</span>
+</header>
+
+<main class="emp-main">
+    <section class="notice-stack">
+        <div th:if="${updated}" class="banner banner--success">Manager information updated successfully.</div>
+        <div th:if="${updateError}" class="banner banner--error">Update failed. Check the values and try again.</div>
+        <div th:if="${error != null}" class="banner banner--error" th:text="${error}">Error</div>
+    </section>
+
+    <div th:if="${manager == null}" class="empty-state">
+        Manager with ID <strong th:text="${managerId}">?</strong> was not found.
+    </div>
+
+    <div th:if="${manager != null}" class="detail-grid">
+        <section class="profile-panel">
+            <div class="profile-top">
+                <span class="avatar avatar--large" th:text="${manager.initials}">AA</span>
+                <div>
+                    <h2 th:text="${manager.fullName}">Full Name</h2>
+                    <p th:text="${manager.job != null ? manager.job.jobTitle : 'No job title'}">Job</p>
+                </div>
+            </div>
+
+            <dl class="detail-list">
+                <div>
+                    <dt>Employee ID</dt>
+                    <dd th:text="${manager.selfId}">0</dd>
+                </div>
+                <div>
+                    <dt>Department</dt>
+                    <dd th:text="${manager.department != null ? manager.department.departmentName : 'N/A'}">Department</dd>
+                </div>
+                <div>
+                    <dt>Email</dt>
+                    <dd th:text="${manager.email}">email</dd>
+                </div>
+                <div>
+                    <dt>Phone</dt>
+                    <dd th:text="${manager.phoneNumber != null ? manager.phoneNumber : 'N/A'}">phone</dd>
+                </div>
+                <div>
+                    <dt>Salary</dt>
+                    <dd th:text="${manager.salary != null ? '$' + #numbers.formatDecimal(manager.salary, 1, 'COMMA', 0, 'POINT') : 'N/A'}">$0</dd>
+                </div>
+                <div>
+                    <dt>Hire Date</dt>
+                    <dd th:text="${manager.hireDate != null ? manager.hireDate : 'N/A'}">date</dd>
+                </div>
+            </dl>
+
+            <form th:action="@{/employees/{id}/detail/update(id=${managerId})}" method="post" class="edit-form">
+                <h3>Update Manager</h3>
+                <label>
+                    Email
+                    <input type="text" name="email" th:value="${manager.email}" required />
+                </label>
+                <label>
+                    Phone
+                    <input type="text" name="phoneNumber" th:value="${manager.phoneNumber}" />
+                </label>
+                <label>
+                    Salary
+                    <input type="number" name="salary" step="0.01" min="0" th:value="${manager.salary}" />
+                </label>
+                <button type="submit" class="btn-primary">Save Changes</button>
+            </form>
+        </section>
+
+        <section class="hierarchy-panel">
+            <div class="panel-heading">
+                <div>
+                    <p class="eyebrow">Who reports to whom</p>
+                    <h2>Hierarchy</h2>
+                </div>
+                <span class="subtle-text">Top to selected manager</span>
+            </div>
+
+            <div class="hierarchy-list">
+                <div th:each="node, stat : ${hierarchy}" class="hierarchy-node">
+                    <div class="node-card" th:classappend="${node.selfId == manager.selfId ? 'node-card--selected' : ''}">
+                        <span class="avatar" th:text="${node.initials}">AA</span>
+                        <div>
+                            <strong th:text="${node.fullName}">Name</strong>
+                            <small th:text="${node.job != null ? node.job.jobTitle : 'N/A'}">Role</small>
+                        </div>
+                        <span th:if="${node.selfId == manager.selfId}" class="current-chip">Selected</span>
+                    </div>
+                    <div th:unless="${stat.last}" class="hierarchy-connector">reports to</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="reports-panel">
+            <div class="panel-heading">
+                <div>
+                    <p class="eyebrow">Employees under manager</p>
+                    <h2>Direct Reports</h2>
+                </div>
+                <span class="subtle-text" th:text="${#lists.size(subordinates) + ' employee(s)'}">0 employee(s)</span>
+            </div>
+
+            <div th:if="${#lists.isEmpty(subordinates)}" class="empty-state">
+                No direct reports found for this manager.
+            </div>
+
+            <div th:unless="${#lists.isEmpty(subordinates)}" class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Job</th>
+                        <th>Department</th>
+                        <th>Email</th>
+                        <th>Salary</th>
+                        <th>Hire Date</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="sub : ${subordinates}">
+                        <td>
+                            <div class="person-cell">
+                                <span class="avatar" th:text="${sub.initials}">AA</span>
+                                <div>
+                                    <strong th:text="${sub.fullName}">Full Name</strong>
+                                    <small>ID <span th:text="${sub.selfId}">0</span></small>
+                                </div>
+                            </div>
+                        </td>
+                        <td th:text="${sub.job != null ? sub.job.jobTitle : 'N/A'}">Job</td>
+                        <td th:text="${sub.department != null ? sub.department.departmentName : 'N/A'}">Department</td>
+                        <td th:text="${sub.email}">email</td>
+                        <td th:text="${sub.salary != null ? '$' + #numbers.formatDecimal(sub.salary, 1, 'COMMA', 0, 'POINT') : 'N/A'}">$0</td>
+                        <td th:text="${sub.hireDate != null ? sub.hireDate : 'N/A'}">date</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer class="emp-footer">
+    <span>HR Management Portal</span>
+    <span>Employees under selected manager</span>
+</footer>
+
+</body>
+</html>
