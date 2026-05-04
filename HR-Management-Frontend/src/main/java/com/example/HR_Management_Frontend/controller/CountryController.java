@@ -28,7 +28,8 @@ public class CountryController {
     @Autowired
     RestTemplate restTemplate;
     
-    private static final String BASE_URL = "http://localhost:8089/api/v1";
+    @Value("${backend.base-url}")
+    private String BASE_URL;
 
     @GetMapping
     public String listCountries(

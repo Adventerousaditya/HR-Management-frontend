@@ -25,18 +25,14 @@ public class CountryService {
     @Value("${backend.base-url}")
     private String baseUrl;
 
-    // -------------------------------------------------------------------------
-    // LIST
-    // -------------------------------------------------------------------------
+    
 
     public Map getCountries(int page) {
         String url = baseUrl + "/countries?projection=countryWithRegion&page=" + page + "&size=20";
         return restTemplate.getForObject(url, Map.class);
     }
 
-    // -------------------------------------------------------------------------
-    // SINGLE
-    // -------------------------------------------------------------------------
+    
 
     public CountryDTO getCountryById(String id) {
     	String url = baseUrl + "/countries/" + id + "?projection=countryWithRegion";
@@ -49,18 +45,14 @@ public class CountryService {
         Map<String, Object> region = (Map<String, Object>) raw.get("region");
         if (region != null && region.get("regionId") != null) {
             Object regionIdRaw = region.get("regionId");
-            // DEBUG — remove after fixing
-            System.out.println("regionId raw value: " + regionIdRaw);
-            System.out.println("regionId raw type: " + regionIdRaw.getClass().getName());
+            
             dto.setRegionId(new BigDecimal(regionIdRaw.toString()));
         }
 
         return dto;
     }
 
-    // -------------------------------------------------------------------------
-    // SAVE (CREATE + UPDATE)
-    // -------------------------------------------------------------------------
+    
 
     public void saveCountry(CountryDTO dto) {
         boolean exists = dto.getCountryId() != null
@@ -78,6 +70,7 @@ public class CountryService {
                     HttpMethod.PUT,
                     request,
                     Map.class);
+            updateRegionAssociation(dto.getCountryId(), dto.getRegionId());
         }
     }
 
@@ -90,9 +83,7 @@ public class CountryService {
         }
     }
 
-    // -------------------------------------------------------------------------
-    // REGIONS (for dropdown)
-    // -------------------------------------------------------------------------
+    
 
     public List<Map> getRegions() {
         String url = baseUrl + "/regions?size=100";
@@ -111,10 +102,18 @@ public class CountryService {
         }
         return regions;
     }
+    private void updateRegionAssociation(String countryId, java.math.BigDecimal regionId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType("text/uri-list"));
+        HttpEntity<String> req = new HttpEntity<>(baseUrl + "/regions/" + regionId, headers);
+        restTemplate.exchange(
+                baseUrl + "/countries/" + countryId + "/region",
+                HttpMethod.PUT,
+                req,
+                Void.class);
+    }
 
-    // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
+    
 
     private Map<String, Object> buildPayload(CountryDTO dto) {
         Map<String, Object> payload = new LinkedHashMap<>();
