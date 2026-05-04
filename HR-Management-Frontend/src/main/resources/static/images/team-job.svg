@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" role="img" aria-label="Jobs module">
+  <rect width="320" height="320" fill="#ede9fe"/>
+  <rect x="68" y="112" width="184" height="124" rx="18" fill="#7c3aed"/>
+  <path d="M124 112V90h72v22" fill="none" stroke="#ddd6fe" stroke-width="16" stroke-linecap="round"/>
+  <path d="M68 154h184" stroke="#ddd6fe" stroke-width="14"/>
+</svg>

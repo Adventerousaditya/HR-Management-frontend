@@ -25,6 +25,12 @@ header h1 {
     font-weight: 600;
 }
 
+.header-note {
+    margin-top: 6px;
+    color: #667085;
+    font-size: 13px;
+}
+
 /* Main */
 main {
     flex: 1;
@@ -53,6 +59,19 @@ main h2 {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    border-color: #98a2b3;
+    box-shadow: 0 12px 30px rgba(16, 24, 40, 0.08);
+}
+
+.card--primary {
+    border-color: #2563eb;
 }
 
 .card-clickable {
