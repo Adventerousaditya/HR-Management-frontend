@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Global Regions | HR Management</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <style>
+        /* ── layout shell ── */
+        body { display: flex; flex-direction: column; min-height: 100vh; }
+
+        .top-nav {
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+            padding: 14px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .top-nav a {
+            font-size: 13px;
+            color: #555;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .top-nav a:hover { color: #2563eb; }
+        .top-nav .brand { font-size: 16px; font-weight: 700; color: #111; }
+
+        /* ── page wrapper ── */
+        .page { flex: 1; padding: 40px; background: #f5f5f5; }
+
+        .page-header {
+            margin-bottom: 28px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .page-header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .filter-form {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .filter-input {
+            width: min(320px, 52vw);
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 14px;
+            background: #fff;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .btn-filter,
+        .btn-clear {
+            border: 0;
+            border-radius: 7px;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-filter {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .btn-clear {
+            background: #eee;
+            color: #444;
+        }
+
+        /* ── table card ── */
+        .table-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        thead tr { border-bottom: 1px solid #ddd; background: #fafafa; }
+
+        th {
+            padding: 13px 20px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        td {
+            padding: 16px 20px;
+            font-size: 14px;
+            border-bottom: 1px solid #eee;
+            color: #222;
+            vertical-align: middle;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #fafbff; }
+
+        .region-id {
+            font-size: 13px;
+            color: #888;
+            font-weight: 600;
+        }
+
+        .region-name { font-weight: 600; font-size: 15px; }
+
+        .btn-view {
+            display: inline-block;
+            padding: 8px 20px;
+            background: #2563eb;
+            color: #fff;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.15s;
+        }
+        .btn-view:hover { background: #1d4ed8; }
+
+        .empty-row td {
+            text-align: center;
+            padding: 48px;
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        /* ── footer ── */
+        footer {
+            padding: 16px 40px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #aaa;
+            display: flex;
+            justify-content: space-between;
+            background: #fff;
+        }
+
+        @media (max-width: 720px) {
+            .page-header {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .filter-form,
+            .filter-input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top navigation -->
+<nav class="top-nav">
+    <span class="brand">HR Management</span>
+    <a th:href="@{/}">&#8592; Back to Home</a>
+</nav>
+
+<!-- Page content -->
+<main class="page">
+    <div class="page-header">
+        <h1>Global Regions</h1>
+        <form class="filter-form" th:action="@{/regions}" method="get">
+            <input class="filter-input"
+                   type="search"
+                   name="q"
+                   placeholder="Search regions"
+                   th:value="${q}" />
+            <button class="btn-filter" type="submit">Search</button>
+            <a class="btn-clear" th:href="@{/regions}" th:if="${q != null and !q.isBlank()}">Clear</a>
+        </form>
+    </div>
+
+    <div class="table-card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Region ID</th>
+                    <th>Region Name</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="empty-row" th:if="${#lists.isEmpty(regions)}">
+                    <td colspan="3">No regions found.</td>
+                </tr>
+
+                <tr th:each="region : ${regions}">
+                    <td>
+                        <span class="region-id" th:text="${region.regionId}">1</span>
+                    </td>
+                    <td>
+                        <span class="region-name" th:text="${region.regionName}">North America</span>
+                    </td>
+                    <td style="text-align: right; padding-right: 24px;">
+                        <a th:href="@{/regions/{id}(id=${region.regionId})}" class="btn-view">
+                            View Details
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer>
+    <span>HR Management Portal</span>
+    <span>Regions Module</span>
+</footer>
+
+</body>
+</html>
