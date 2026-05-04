@@ -14,40 +14,43 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.client.RestTemplate;
 
 import com.example.HR_Management_Frontend.dto.CountryDTO;
+import com.example.HR_Management_Frontend.service.CountryService;
 
 import java.util.List;
 import java.util.Map;
 
 @Controller
+@RequestMapping("/countries")
 public class CountryController {
 
-	@Autowired
-    private RestTemplate restTemplate;
-
+    @Autowired
+    private CountryService service;
+    @Autowired
+    RestTemplate restTemplate;
+    
     private static final String BASE_URL = "http://localhost:8089/api/v1";
 
+    @GetMapping
+    public String listCountries(
+            @RequestParam(defaultValue = "0") int page,
+            Model model) {
 
-    @GetMapping("/countries")
-    public String listCountries( @ModelAttribute("message") String message,@RequestParam(defaultValue = "0") int page, Model model) {
+        Map body     = service.getCountries(page);
+        Map embedded = (Map) body.get("_embedded");
+        List<Map> countries = embedded != null
+                ? (List<Map>) embedded.get("countries")
+                : List.of();
 
-        String url = BASE_URL + "/countries?projection=countryWithRegion&page=" + page + "&size=20";;
-    	
-        ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
-        Map body = response.getBody();
-        Map embedded = (Map) response.getBody().get("_embedded");
-        List<Map> countries = (List<Map>) embedded.get("countries");
-        
         Map<String, Object> pageInfo = (Map<String, Object>) body.get("page");
         int totalPages = ((Number) pageInfo.get("totalPages")).intValue();
 
-        model.addAttribute("countries", countries);
-        model.addAttribute("currentPage",page);
-        model.addAttribute("totalPages",totalPages);
-    	
+        model.addAttribute("countries",   countries);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages",  totalPages);
+
         return "country/list";
     }
-    
-    @GetMapping("/countries/{id}")
+    @GetMapping("/{id}")
     public String countryDetail(@PathVariable String id, Model model) {
 
         // 1. Fetch country info with region name
@@ -68,6 +71,61 @@ public class CountryController {
 
         return "country/detail";
     }
-    
-    
+
+    @GetMapping("/new")
+    public String showCreateForm(Model model) {
+        model.addAttribute("country", new CountryDTO());
+        model.addAttribute("regions", service.getRegions());
+        model.addAttribute("isEdit",  false);
+        return "country/form";
+    }
+
+
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable String id, Model model) {
+        model.addAttribute("country", service.getCountryById(id));
+        model.addAttribute("regions", service.getRegions());
+        model.addAttribute("isEdit",  true);
+        return "country/form";
+    }
+
+    @PostMapping("/save")
+    public String saveCountry(
+            @Valid @ModelAttribute("country") CountryDTO country,
+            BindingResult result,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+
+        if (result.hasErrors()) {
+            model.addAttribute("regions", service.getRegions());
+            model.addAttribute("isEdit",  country.getCountryId() != null && !country.getCountryId().isBlank());
+            return "country/form";
+        }
+
+        try {
+            service.saveCountry(country);
+            redirectAttributes.addFlashAttribute("message",
+                    "Country '" + country.getCountryId() + "' saved successfully.");
+            return "redirect:/countries";
+
+        } catch (HttpClientErrorException ex) {
+            model.addAttribute("apiError", extractMessage(ex));
+            model.addAttribute("regions",  service.getRegions());
+            model.addAttribute("isEdit",   country.getCountryId() != null && !country.getCountryId().isBlank());
+            return "country/form";
+        }
+    }
+
+    private String extractMessage(HttpClientErrorException ex) {
+        try {
+            String body = ex.getResponseBodyAsString();
+            int idx     = body.indexOf("\"message\"");
+            if (idx >= 0) {
+                int start = body.indexOf("\"", idx + 9) + 1;
+                int end   = body.indexOf("\"", start);
+                return body.substring(start, end);
+            }
+        } catch (Exception ignored) {}
+        return "An error occurred: " + ex.getStatusCode();
+    }
 }
