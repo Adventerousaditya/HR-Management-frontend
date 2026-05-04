@@ -74,6 +74,18 @@ main h2 {
     border-color: #2563eb;
 }
 
+.card-clickable {
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.card-clickable:hover {
+    border-color: #2563eb;
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
+    transform: translateY(-2px);
+}
+
 .card img {
     width: 100%;
     aspect-ratio: 1 / 1;
