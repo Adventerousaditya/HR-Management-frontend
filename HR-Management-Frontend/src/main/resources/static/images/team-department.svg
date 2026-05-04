@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" role="img" aria-label="Departments module">
+  <rect width="320" height="320" fill="#e0f2fe"/>
+  <rect x="74" y="86" width="172" height="164" rx="16" fill="#0284c7"/>
+  <rect x="104" y="116" width="34" height="34" fill="#bae6fd"/>
+  <rect x="143" y="116" width="34" height="34" fill="#bae6fd"/>
+  <rect x="182" y="116" width="34" height="34" fill="#bae6fd"/>
+  <rect x="104" y="164" width="34" height="34" fill="#bae6fd"/>
+  <rect x="143" y="164" width="34" height="86" fill="#bae6fd"/>
+  <rect x="182" y="164" width="34" height="34" fill="#bae6fd"/>
+</svg>

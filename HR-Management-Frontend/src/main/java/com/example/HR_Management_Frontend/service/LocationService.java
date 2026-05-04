@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -166,8 +167,8 @@ public class LocationService {
             if (depts == null) return new ArrayList<>();
             
             depts.forEach(dept -> {
-                if (dept.getDepartmentId() == null) {
-                    dept.setDepartmentId(dept.extractId());
+                if (dept.getDepartmentId() == null && dept.extractId() != null) {
+                    dept.setDepartmentId(java.math.BigDecimal.valueOf(dept.extractId()));
                 }
             });
             return depts;

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" role="img" aria-label="Countries module">
+  <rect width="320" height="320" fill="#dcfce7"/>
+  <circle cx="160" cy="160" r="92" fill="#16a34a"/>
+  <path d="M98 132h124M90 174h140M160 70c-34 42-34 138 0 180M160 70c34 42 34 138 0 180" fill="none" stroke="#bbf7d0" stroke-width="16"/>
+</svg>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Managers - HR Portal</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <link rel="stylesheet" th:href="@{/css/employees.css}" />
+</head>
+<body class="emp-page">
+
+<header class="emp-header">
+    <a th:href="@{/}" class="back-link">Home</a>
+    <div>
+        <h1>Managers</h1>
+        <p class="header-note">Employee master table</p>
+    </div>
+    <span class="emp-badge" th:text="${totalManagers + ' manager(s)'}">0 manager(s)</span>
+</header>
+
+<main class="emp-main">
+    <section class="notice-stack">
+        <div th:if="${created}" class="banner banner--success">Employee created successfully.</div>
+        <div th:if="${updated}" class="banner banner--success">Employee updated successfully.</div>
+        <div th:if="${error != null}" class="banner banner--error" th:text="${error}">Error</div>
+    </section>
+
+    <section class="tool-panel">
+        <div class="panel-heading">
+            <div>
+                <p class="eyebrow">CRU operations</p>
+                <h2>Add Employee</h2>
+            </div>
+            <span class="subtle-text">Delete is intentionally not available</span>
+        </div>
+
+        <form th:action="@{/employees}" th:object="${newEmployee}" method="post" class="create-form">
+            <label>
+                Employee ID
+                <input type="number" th:field="*{employeeId}" required placeholder="9920" />
+            </label>
+            <label>
+                First name
+                <input type="text" th:field="*{firstName}" required />
+            </label>
+            <label>
+                Last name
+                <input type="text" th:field="*{lastName}" required />
+            </label>
+            <label>
+                Email
+                <input type="email" th:field="*{email}" required placeholder="new.employee@hr.com" />
+            </label>
+            <label>
+                Phone
+                <input type="text" th:field="*{phoneNumber}" />
+            </label>
+            <label>
+                Hire date
+                <input type="date" th:field="*{hireDate}" required />
+            </label>
+            <label>
+                Salary
+                <input type="number" step="0.01" min="0.01" th:field="*{salary}" required />
+            </label>
+            <label>
+                Commission
+                <input type="number" step="0.01" min="0" max="1" th:field="*{commissionPct}" />
+            </label>
+            <label>
+                Job ID
+                <input type="text" th:field="*{job}" placeholder="AD_PRES" required />
+            </label>
+            <label>
+                Department ID
+                <input type="text" th:field="*{department}" placeholder="80" />
+            </label>
+            <label>
+                Manager ID
+                <input type="text" th:field="*{manager}" placeholder="100" />
+            </label>
+            <button type="submit" class="btn-primary">Create</button>
+        </form>
+    </section>
+
+    <section class="table-section">
+        <div class="panel-heading">
+            <div>
+                <p class="eyebrow">Page 2</p>
+                <h2>All Managers</h2>
+            </div>
+            <span class="subtle-text">Page <span th:text="${currentPage + 1}">1</span> of <span th:text="${totalPages}">1</span></span>
+        </div>
+
+        <div th:if="${#lists.isEmpty(managers)}" class="empty-state">
+            No managers found. The backend returns managers from employees who have subordinates.
+        </div>
+
+        <div th:unless="${#lists.isEmpty(managers)}" class="table-wrap">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>Manager</th>
+                    <th>Job</th>
+                    <th>Department</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Salary</th>
+                    <th>Update</th>
+                    <th>Open</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="mgr : ${managers}">
+                    <td>
+                        <div class="person-cell">
+                            <span class="avatar" th:text="${mgr.initials}">AA</span>
+                            <div>
+                                <strong th:text="${mgr.fullName}">Full Name</strong>
+                                <small>ID <span th:text="${mgr.selfId}">0</span></small>
+                            </div>
+                        </div>
+                    </td>
+                    <td th:text="${mgr.job != null ? mgr.job.jobTitle : 'N/A'}">Job</td>
+                    <td th:text="${mgr.department != null ? mgr.department.departmentName : 'N/A'}">Department</td>
+                    <td th:text="${mgr.email}">email</td>
+                    <td th:text="${mgr.phoneNumber != null ? mgr.phoneNumber : 'N/A'}">phone</td>
+                    <td th:text="${mgr.salary != null ? '$' + #numbers.formatDecimal(mgr.salary, 1, 'COMMA', 0, 'POINT') : 'N/A'}">$0</td>
+                    <td>
+                        <form th:action="@{/employees/{id}/update(id=${mgr.selfId})}" method="post" class="inline-update">
+                            <input type="text" name="email" th:value="${mgr.email}" aria-label="Email" />
+                            <input type="text" name="phoneNumber" th:value="${mgr.phoneNumber}" aria-label="Phone" />
+                            <input type="number" step="0.01" min="0" name="salary" th:value="${mgr.salary}" aria-label="Salary" />
+                            <button type="submit" class="btn-compact">Save</button>
+                        </form>
+                    </td>
+                    <td>
+                        <a th:href="@{/employees/{id}(id=${mgr.selfId})}" class="btn-link">Details</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <nav class="pager" th:if="${totalPages > 1}">
+            <a th:if="${hasPrevious}" th:href="@{/employees(page=${currentPage - 1})}" class="btn-link">Previous</a>
+            <span th:unless="${hasPrevious}" class="btn-disabled">Previous</span>
+            <a th:if="${hasNext}" th:href="@{/employees(page=${currentPage + 1})}" class="btn-link">Next</a>
+            <span th:unless="${hasNext}" class="btn-disabled">Next</span>
+        </nav>
+    </section>
+</main>
+
+<footer class="emp-footer">
+    <span>HR Management Portal</span>
+    <span>Managers listing with CRU</span>
+</footer>
+
+</body>
+</html>

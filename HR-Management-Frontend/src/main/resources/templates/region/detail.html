@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="${pageTitle} + ' | HR Management'">Region Detail</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <style>
+        body { display: flex; flex-direction: column; min-height: 100vh; background: #f5f5f5; }
+
+        /* ── nav ── */
+        .top-nav {
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+            padding: 14px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .top-nav .brand { font-size: 16px; font-weight: 700; color: #111; }
+        .top-nav a {
+            font-size: 13px; color: #555; text-decoration: none;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .top-nav a:hover { color: #2563eb; }
+
+        /* ── page ── */
+        .page { flex: 1; padding: 40px; }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            color: #666;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+        .back-link:hover { color: #2563eb; }
+
+        .region-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 28px;
+        }
+
+        /* ── stat cards ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stat-icon {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .stat-icon.blue { background: #eff6ff; }
+        .stat-icon.green { background: #f0fdf4; }
+
+        .stat-value { font-size: 28px; font-weight: 700; line-height: 1; color: #111; }
+        .stat-label { font-size: 13px; color: #888; margin-bottom: 4px; }
+
+        /* ── section card ── */
+        .section-card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .section-heading {
+            padding: 15px 20px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ── country chips ── */
+        .country-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 10px;
+            padding: 16px 20px;
+        }
+
+        .country-chip {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* ── tables ── */
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        thead tr { background: #fafafa; border-bottom: 1px solid #ddd; }
+        th {
+            padding: 11px 18px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            white-space: nowrap;
+        }
+        td {
+            padding: 14px 18px;
+            font-size: 14px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+            color: #222;
+        }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #fafbff; }
+
+        .badge {
+            display: inline-block;
+            background: #eff6ff;
+            color: #2563eb;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 99px;
+        }
+
+        .emp-name { font-weight: 600; }
+        .emp-email { font-size: 12px; color: #999; margin-top: 2px; }
+
+        .salary { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+        .empty {
+            text-align: center;
+            padding: 36px;
+            color: #bbb;
+            font-size: 14px;
+        }
+
+        /* ── footer ── */
+        footer {
+            padding: 16px 40px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #aaa;
+            display: flex;
+            justify-content: space-between;
+            background: #fff;
+        }
+
+        @media (max-width: 600px) {
+            .stats-row { grid-template-columns: 1fr; }
+            .page { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top nav -->
+<nav class="top-nav">
+    <span class="brand">HR Management</span>
+    <a th:href="@{/}">&#8592; Home</a>
+</nav>
+
+<main class="page">
+
+    <!-- Back link -->
+    <a th:href="@{/regions}" class="back-link">&#8592; Back to Regions</a>
+
+    <!-- Region heading -->
+    <h1 class="region-title" th:text="${region.regionName}">North America</h1>
+
+    <!-- ── Stat cards ── -->
+    <div class="stats-row">
+
+        <div class="stat-card">
+            <div class="stat-icon blue">
+                <svg width="22" height="22" fill="none" viewBox="0 0 24 24"
+                     stroke="#2563eb" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0
+                             l-4.243-4.243a8 8 0 1111.314 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                </svg>
+            </div>
+            <div>
+                <div class="stat-label">Active Locations</div>
+                <div class="stat-value" th:text="${region.activeLocations}">0</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon green">
+                <svg width="22" height="22" fill="none" viewBox="0 0 24 24"
+                     stroke="#15803d" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7
+                             m10 0v-2c0-.656-.126-1.283-.356-1.857
+                             M7 20H2v-2a3 3 0 015.356-1.857
+                             M7 20v-2c0-.656.126-1.283.356-1.857
+                             m0 0a5.002 5.002 0 019.288 0"/>
+                </svg>
+            </div>
+            <div>
+                <div class="stat-label">Total Employees</div>
+                <div class="stat-value" th:text="${region.activeEmployees}">0</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ── Associated Countries ── -->
+    <div class="section-card">
+        <div class="section-heading">
+            &#127758; Associated Countries
+        </div>
+
+        <div th:if="${#lists.isEmpty(region.countries)}" class="empty">
+            No countries associated with this region.
+        </div>
+
+        <div class="country-grid" th:unless="${#lists.isEmpty(region.countries)}">
+            <div class="country-chip"
+                 th:each="country : ${region.countries}"
+                 th:text="${country.countryName}">United States</div>
+        </div>
+    </div>
+
+    <!-- ── Locations ── -->
+    <div class="section-card">
+        <div class="section-heading">
+            &#128205; Locations
+        </div>
+
+        <div th:if="${#lists.isEmpty(region.locations)}" class="empty">
+            No locations found in this region.
+        </div>
+
+        <div class="table-wrap" th:unless="${#lists.isEmpty(region.locations)}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Location ID</th>
+                        <th>City</th>
+                        <th>State / Province</th>
+                        <th>Country</th>
+                        <th>Street Address</th>
+                        <th>Postal Code</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="loc : ${region.locations}">
+                        <td><span class="badge" th:text="${loc.locationId}">1000</span></td>
+                        <td th:text="${loc.city}">Seattle</td>
+                        <td th:text="${loc.stateProvince} ?: '—'">Washington</td>
+                        <td th:text="${loc.countryName}">United States</td>
+                        <td th:text="${loc.streetAddress} ?: '—'">2017 Shinjuku-ku</td>
+                        <td th:text="${loc.postalCode} ?: '—'">98199</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+
+<footer>
+    <span>HR Management Portal</span>
+    <span>Regions Module — Detail View</span>
+</footer>
+
+</body>
+</html>

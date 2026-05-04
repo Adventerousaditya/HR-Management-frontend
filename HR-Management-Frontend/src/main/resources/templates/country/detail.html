@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${country['countryName']} + ' — Detail'">Country Detail</title>
+</head>
+<body>
+
+    <h1 th:text="${country['countryName']}"></h1>
+    <p>
+        Country ID: <strong th:text="${country['countryId']}"></strong>
+        &nbsp;|&nbsp;
+        Region: <strong th:text="${country['region'] != null ? country['region']['regionName'] : 'N/A'}"></strong>
+    </p>
+
+    <h3>Employees in this country: <span th:text="${employeeCount}"></span></h3>
+
+    <table th:if="${employeeCount > 0}">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="e, idx : ${employees}">
+                <td th:text="${idx.count}"></td>
+                <td th:text="${e['firstName'] + ' ' + e['lastName']}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p th:if="${employeeCount == 0}">No employees found in this country.</p>
+
+    <br>
+    <a href="/countries">← Back to Countries</a>
+
+</body>
+</html>
