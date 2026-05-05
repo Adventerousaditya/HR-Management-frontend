@@ -16,7 +16,7 @@ public class DepartmentViewController {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @Value("${backend.url}")
+    @Value("${backend.base-url}")
     private String backendUrl;
 
     private static final String DEPT_PATH = "/department";

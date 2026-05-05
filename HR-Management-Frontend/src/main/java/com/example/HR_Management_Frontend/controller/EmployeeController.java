@@ -5,7 +5,9 @@ import com.example.HR_Management_Frontend.dto.EmployeeListResponse;
 import com.example.HR_Management_Frontend.dto.EmployeeUpdateRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,15 +20,17 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+//import java.net.URI;
+//import java.net.http.HttpClient;
+//import java.net.http.HttpRequest;
+//import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+//import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+//import java.util.Map;
 import java.util.Objects;
 
 @Controller
@@ -37,7 +41,7 @@ public class EmployeeController {
     private static final int MAX_HIERARCHY_HOPS = 12;
 
     private final RestTemplate restTemplate;
-    private final HttpClient httpClient = HttpClient.newHttpClient();
+//    private final HttpClient httpClient = HttpClient.newHttpClient();
 
     @Value("${backend.base-url:http://localhost:8080/api/v1}")
     private String backendUrl;
@@ -46,9 +50,57 @@ public class EmployeeController {
         this.restTemplate = restTemplate;
     }
 
+//    @GetMapping
+//    public String listManagers(
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(required = false) String error,
+//            @RequestParam(required = false) String created,
+//            @RequestParam(required = false) String updated,
+//            @RequestParam(required = false) String updateError,
+//            Model model
+//    ) {
+//        List<EmployeeDTO> managers = Collections.emptyList();
+//        String loadError = null;
+//
+//        try {
+//            EmployeeListResponse response = restTemplate.getForObject(
+//                    backendUrl + "/employees/search/managers",
+//                    EmployeeListResponse.class
+//            );
+//            managers = response != null ? response.getEmployees() : Collections.emptyList();
+//            managers.forEach(this::enrichEmployeeAssociations);
+//        } catch (Exception e) {
+//            loadError = "Could not fetch managers. Please make sure the backend is running on " + backendUrl + ".";
+//        }
+//
+//        int totalManagers = managers.size();
+//        int totalPages = Math.max(1, (int) Math.ceil(totalManagers / (double) PAGE_SIZE));
+//        int currentPage = Math.max(0, Math.min(page, totalPages - 1));
+//        int fromIndex = Math.min(currentPage * PAGE_SIZE, totalManagers);
+//        int toIndex = Math.min(fromIndex + PAGE_SIZE, totalManagers);
+//
+//        model.addAttribute("managers", managers.subList(fromIndex, toIndex));
+//        model.addAttribute("totalManagers", totalManagers);
+//        model.addAttribute("currentPage", currentPage);
+//        model.addAttribute("totalPages", totalPages);
+//        model.addAttribute("hasPrevious", currentPage > 0);
+//        model.addAttribute("hasNext", currentPage < totalPages - 1);
+//        model.addAttribute("pageSize", PAGE_SIZE);
+//        model.addAttribute("newEmployee", new EmployeeUpdateRequest());
+//        String pageError = updateError != null
+//                ? "Could not update employee. If changing email, use a valid email address."
+//                : error;
+//        model.addAttribute("error", loadError != null ? loadError : pageError);
+//        model.addAttribute("created", created != null);
+//        model.addAttribute("updated", updated != null);
+//
+//        return "managers";
+//    }
+
     @GetMapping
     public String listManagers(
             @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) String search,   // ← ADD THIS
             @RequestParam(required = false) String error,
             @RequestParam(required = false) String created,
             @RequestParam(required = false) String updated,
@@ -69,6 +121,21 @@ public class EmployeeController {
             loadError = "Could not fetch managers. Please make sure the backend is running on " + backendUrl + ".";
         }
 
+        // ── Search filter ────────────────────────────────────────────────────────
+        final String q = (search != null && !search.isBlank()) ? search.trim().toLowerCase() : null;
+        if (q != null) {
+            managers = managers.stream()
+                    .filter(m -> m.getFullName().toLowerCase().contains(q)
+                            || m.getSelfId().contains(q)
+                            || (m.getEmail() != null && m.getEmail().toLowerCase().contains(q))
+                            || (m.getJob() != null && m.getJob().getJobTitle() != null
+                                && m.getJob().getJobTitle().toLowerCase().contains(q))
+                            || (m.getDepartment() != null && m.getDepartment().getDepartmentName() != null
+                                && m.getDepartment().getDepartmentName().toLowerCase().contains(q)))
+                    .collect(java.util.stream.Collectors.toList());
+        }
+        // ────────────────────────────────────────────────────────────────────────
+
         int totalManagers = managers.size();
         int totalPages = Math.max(1, (int) Math.ceil(totalManagers / (double) PAGE_SIZE));
         int currentPage = Math.max(0, Math.min(page, totalPages - 1));
@@ -82,6 +149,7 @@ public class EmployeeController {
         model.addAttribute("hasPrevious", currentPage > 0);
         model.addAttribute("hasNext", currentPage < totalPages - 1);
         model.addAttribute("pageSize", PAGE_SIZE);
+        model.addAttribute("searchQuery", search != null ? search : "");  // ← ADD
         model.addAttribute("newEmployee", new EmployeeUpdateRequest());
         String pageError = updateError != null
                 ? "Could not update employee. If changing email, use a valid email address."
@@ -92,7 +160,7 @@ public class EmployeeController {
 
         return "managers";
     }
-
+    
     @PostMapping
     public String createEmployee(
             @ModelAttribute EmployeeUpdateRequest request,
@@ -122,9 +190,10 @@ public class EmployeeController {
             @PathVariable String id,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String phoneNumber,
-            @RequestParam(required = false) String salary
+            @RequestParam(required = false) String salary,
+            RedirectAttributes redirectAttributes
     ) {
-        return updateEmployee(id, email, phoneNumber, salary, "/employees");
+        return updateEmployee(id, email, phoneNumber, salary, "/employees", redirectAttributes);
     }
 
     @GetMapping("/{id}")
@@ -174,51 +243,116 @@ public class EmployeeController {
             @PathVariable String id,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String phoneNumber,
-            @RequestParam(required = false) String salary
+            @RequestParam(required = false) String salary,
+            RedirectAttributes redirectAttributes
     ) {
-        return updateEmployee(id, email, phoneNumber, salary, "/employees/" + id);
+        return updateEmployee(id, email, phoneNumber, salary, "/employees/" + id, redirectAttributes);
     }
 
+//    private String updateEmployee(
+//            String id,
+//            String email,
+//            String phoneNumber,
+//            String salary,
+//            String redirectBase
+//    ) {
+//        try {
+//            EmployeeDTO current = fetchEmployee(id);
+//            if (current == null) {
+//                return "redirect:" + redirectBase + "?updateError=true";
+//            }
+//            enrichEmployeeAssociations(current);
+//
+//            Map<String, Object> patch = new LinkedHashMap<>();
+//
+//            String submittedEmail = email != null ? email.trim() : null;
+//            boolean emailChanged = submittedEmail != null && !Objects.equals(submittedEmail, current.getEmail());
+//            if (emailChanged && !isValidEmail(submittedEmail)) {
+//                return "redirect:" + redirectBase + "?updateError=true";
+//            }
+//
+//            if (emailChanged) {
+//                patch.put("email", submittedEmail);
+//            }
+//            if (phoneNumber != null && !Objects.equals(phoneNumber.trim(), current.getPhoneNumber())) {
+//                patch.put("phoneNumber", phoneNumber.trim());
+//            }
+//            if (salary != null && !salary.isBlank()) {
+//                BigDecimal newSalary = new BigDecimal(salary.trim());
+//                if (!sameAmount(newSalary, current.getSalary())) {
+//                    patch.put("salary", newSalary);
+//                }
+//            }
+//
+//            if (!patch.isEmpty()) {
+//                if (!patch.containsKey("email") && !isValidEmail(current.getEmail())) {
+//                    patch.put("email", generatedValidEmail(current));
+//                }
+//                sendPatch(id, patch);
+//            }
+//
+//            return "redirect:" + redirectBase + "?updated=true";
+//        } catch (Exception e) {
+//            return "redirect:" + redirectBase + "?updateError=true";
+//        }
+//    }
     private String updateEmployee(
             String id,
             String email,
             String phoneNumber,
             String salary,
-            String redirectBase
+            String redirectBase,
+            RedirectAttributes redirectAttributes
     ) {
         try {
             EmployeeDTO current = fetchEmployee(id);
             if (current == null) {
                 return "redirect:" + redirectBase + "?updateError=true";
             }
-            enrichEmployeeAssociations(current);
+
+            // Enrich best-effort only — never let this abort the update
+            try { enrichEmployeeAssociations(current); } catch (Exception ignored) {}
 
             Map<String, Object> patch = new LinkedHashMap<>();
 
             String submittedEmail = email != null ? email.trim() : null;
-            boolean emailChanged = submittedEmail != null && !Objects.equals(submittedEmail, current.getEmail());
-            if (emailChanged && !isValidEmail(submittedEmail)) {
-                return "redirect:" + redirectBase + "?updateError=true";
-            }
-
-            if (emailChanged) {
+            if (submittedEmail != null && !submittedEmail.isBlank()
+                    && !Objects.equals(submittedEmail, current.getEmail())) {
+                if (!isValidEmail(submittedEmail)) {
+                    return "redirect:" + redirectBase + "?updateError=true";
+                }
+                if (submittedEmail.length() > 25) {
+                    redirectAttributes.addAttribute(
+                        "error", "Email cannot exceed 25 characters (submitted: " + submittedEmail.length() + " chars).");
+                    return "redirect:" + redirectBase;
+                }
                 patch.put("email", submittedEmail);
             }
+
             if (phoneNumber != null && !Objects.equals(phoneNumber.trim(), current.getPhoneNumber())) {
                 patch.put("phoneNumber", phoneNumber.trim());
             }
+
             if (salary != null && !salary.isBlank()) {
-                BigDecimal newSalary = new BigDecimal(salary.trim());
-                if (!sameAmount(newSalary, current.getSalary())) {
-                    patch.put("salary", newSalary);
+                try {
+                    BigDecimal newSalary = new BigDecimal(salary.trim());
+                    if (!sameAmount(newSalary, current.getSalary())) {
+                        patch.put("salary", newSalary);
+                    }
+                } catch (NumberFormatException e) {
+                    return "redirect:" + redirectBase + "?updateError=true";
                 }
             }
 
             if (!patch.isEmpty()) {
-                if (!patch.containsKey("email") && !isValidEmail(current.getEmail())) {
-                    patch.put("email", generatedValidEmail(current));
-                }
-                sendPatch(id, patch);
+            	HttpHeaders headers = new HttpHeaders();
+            	headers.setContentType(MediaType.APPLICATION_JSON);
+                restTemplate.exchange(
+                        backendUrl + "/employees/" + id + "/editable",
+                        HttpMethod.PATCH,
+                        new HttpEntity<>(patch, headers),
+                        Void.class
+                );
             }
 
             return "redirect:" + redirectBase + "?updated=true";
@@ -227,58 +361,58 @@ public class EmployeeController {
         }
     }
 
-    private void sendPatch(String id, Map<String, Object> patch) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(backendUrl + "/employees/" + id))
-                .header("Content-Type", "application/json")
-                .method("PATCH", HttpRequest.BodyPublishers.ofString(toJson(patch)))
-                .build();
-
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new IllegalStateException("Backend update failed with status " + response.statusCode());
-        }
-    }
-
-    private String toJson(Map<String, Object> values) {
-        StringBuilder json = new StringBuilder("{");
-        boolean first = true;
-
-        for (Map.Entry<String, Object> entry : values.entrySet()) {
-            if (!first) {
-                json.append(',');
-            }
-            first = false;
-
-            json.append('"').append(escapeJson(entry.getKey())).append('"').append(':');
-            Object value = entry.getValue();
-            if (value instanceof Number) {
-                json.append(value);
-            } else {
-                json.append('"').append(escapeJson(String.valueOf(value))).append('"');
-            }
-        }
-
-        return json.append('}').toString();
-    }
-
-    private String escapeJson(String value) {
-        return value.replace("\\", "\\\\").replace("\"", "\\\"");
-    }
+//    private void sendPatch(String id, Map<String, Object> patch) throws Exception {
+//        HttpRequest request = HttpRequest.newBuilder()
+//                .uri(URI.create(backendUrl + "/employees/" + id))
+//                .header("Content-Type", "application/json")
+//                .method("PATCH", HttpRequest.BodyPublishers.ofString(toJson(patch)))
+//                .build();
+//
+//        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+//        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+//            throw new IllegalStateException("Backend update failed with status " + response.statusCode());
+//        }
+//    }
+//
+//    private String toJson(Map<String, Object> values) {
+//        StringBuilder json = new StringBuilder("{");
+//        boolean first = true;
+//
+//        for (Map.Entry<String, Object> entry : values.entrySet()) {
+//            if (!first) {
+//                json.append(',');
+//            }
+//            first = false;
+//
+//            json.append('"').append(escapeJson(entry.getKey())).append('"').append(':');
+//            Object value = entry.getValue();
+//            if (value instanceof Number) {
+//                json.append(value);
+//            } else {
+//                json.append('"').append(escapeJson(String.valueOf(value))).append('"');
+//            }
+//        }
+//
+//        return json.append('}').toString();
+//    }
+//
+//    private String escapeJson(String value) {
+//        return value.replace("\\", "\\\\").replace("\"", "\\\"");
+//    }
 
     private boolean isValidEmail(String value) {
         return value != null && value.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
     }
 
-    private String generatedValidEmail(EmployeeDTO employee) {
-        String id = employee.getSelfId();
-        String name = employee.getFullName().toLowerCase().replaceAll("[^a-z0-9]+", ".");
-        name = name.replaceAll("^\\.+|\\.+$", "");
-        if (name.isBlank()) {
-            name = "employee";
-        }
-        return name + "." + id + "@hr.com";
-    }
+//    private String generatedValidEmail(EmployeeDTO employee) {
+//        String id = employee.getSelfId();
+//        String name = employee.getFullName().toLowerCase().replaceAll("[^a-z0-9]+", ".");
+//        name = name.replaceAll("^\\.+|\\.+$", "");
+//        if (name.isBlank()) {
+//            name = "employee";
+//        }
+//        return name + "." + id + "@hr.com";
+//    }
 
     private boolean sameAmount(BigDecimal left, BigDecimal right) {
         if (left == null || right == null) {

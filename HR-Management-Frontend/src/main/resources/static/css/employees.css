@@ -180,7 +180,25 @@ input:focus {
 .table-wrap {
     overflow-x: auto;
 }
+.search-bar {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
 
+.search-input {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border, #d1d5db);
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.search-input:focus {
+    outline: 2px solid var(--primary, #3b82f6);
+    outline-offset: 1px;
+}
 .data-table {
     width: 100%;
     border-collapse: collapse;

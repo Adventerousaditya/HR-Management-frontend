@@ -146,36 +146,36 @@ public class EmployeeUpdateRequest {
 
     // ── Getters / Setters ────────────────────────────────────────────────────
 
-    public BigDecimal getEmployeeId()               { return employeeId; }
-    public void setEmployeeId(BigDecimal v)         { this.employeeId = v; }
+    public BigDecimal getEmployeeId() { return employeeId; }
+    public void setEmployeeId(BigDecimal v) { this.employeeId = v; }
 
-    public String getFirstName()                    { return firstName; }
-    public void setFirstName(String v)              { this.firstName = v; }
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String v) { this.firstName = v; }
 
-    public String getLastName()                     { return lastName; }
-    public void setLastName(String v)               { this.lastName = v; }
+    public String getLastName() { return lastName; }
+    public void setLastName(String v) { this.lastName = v; }
 
-    public String getEmail()                        { return email; }
-    public void setEmail(String v)                  { this.email = v; }
+    public String getEmail() { return email; }
+    public void setEmail(String v) { this.email = v; }
 
-    public String getPhoneNumber()                  { return phoneNumber; }
-    public void setPhoneNumber(String v)            { this.phoneNumber = v; }
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String v) { this.phoneNumber = v; }
 
-    public LocalDate getHireDate()                  { return hireDate; }
-    public void setHireDate(LocalDate v)            { this.hireDate = v; }
+    public LocalDate getHireDate() { return hireDate; }
+    public void setHireDate(LocalDate v) { this.hireDate = v; }
 
-    public BigDecimal getSalary()                   { return salary; }
-    public void setSalary(BigDecimal v)             { this.salary = v; }
+    public BigDecimal getSalary() { return salary; }
+    public void setSalary(BigDecimal v) { this.salary = v; }
 
-    public BigDecimal getCommissionPct()            { return commissionPct; }
-    public void setCommissionPct(BigDecimal v)      { this.commissionPct = v; }
+    public BigDecimal getCommissionPct() { return commissionPct; }
+    public void setCommissionPct(BigDecimal v) { this.commissionPct = v; }
 
-    public String getJob()                          { return job; }
-    public void setJob(String v)                    { this.job = v; }
+    public String getJob() { return job; }
+    public void setJob(String v) { this.job = v; }
 
-    public String getDepartment()                   { return department; }
-    public void setDepartment(String v)             { this.department = v; }
+    public String getDepartment() { return department; }
+    public void setDepartment(String v) { this.department = v; }
 
-    public String getManager()                      { return manager; }
-    public void setManager(String v)                { this.manager = v; }
+    public String getManager() { return manager; }
+    public void setManager(String v) { this.manager = v; }
 }
