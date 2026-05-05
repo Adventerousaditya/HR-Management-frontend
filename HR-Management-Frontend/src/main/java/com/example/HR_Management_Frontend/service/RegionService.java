@@ -19,7 +19,7 @@ public class RegionService {
     private final RestTemplate restTemplate;
     private static final Pattern LAST_PATH_SEGMENT = Pattern.compile(".*/([^/?#]+)(?:[?#].*)?$");
 
-    @Value("${backend.base-url}")
+    @Value("${backend.base-url:http://localhost:8080/api/v1}")
     private String baseUrl;
 
     public RegionService(RestTemplate restTemplate) {

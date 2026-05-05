@@ -18,15 +18,15 @@ public class JobDTO {
 
     public JobDTO() {}
 
-    public String getJobId()                        { return jobId; }
-    public void setJobId(String jobId)              { this.jobId = jobId; }
+    public String getJobId() { return jobId; }
+    public void setJobId(String jobId) { this.jobId = jobId; }
 
-    public String getJobTitle()                     { return jobTitle; }
-    public void setJobTitle(String jobTitle)        { this.jobTitle = jobTitle; }
+    public String getJobTitle() { return jobTitle; }
+    public void setJobTitle(String jobTitle) { this.jobTitle = jobTitle; }
 
-    public java.math.BigDecimal getMinSalary()      { return minSalary; }
-    public void setMinSalary(java.math.BigDecimal v){ this.minSalary = v; }
+    public java.math.BigDecimal getMinSalary() { return minSalary; }
+    public void setMinSalary(java.math.BigDecimal v) { this.minSalary = v; }
 
-    public java.math.BigDecimal getMaxSalary()      { return maxSalary; }
-    public void setMaxSalary(java.math.BigDecimal v){ this.maxSalary = v; }
+    public java.math.BigDecimal getMaxSalary() { return maxSalary; }
+    public void setMaxSalary(java.math.BigDecimal v) { this.maxSalary = v; }
 }

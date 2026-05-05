@@ -84,9 +84,28 @@
     </section>
 
     <section class="table-section">
+		<section class="table-section">
+
+		    <!-- ── Search bar ─────────────────────────────────────────── -->
+		    <form th:action="@{/employees}" method="get" class="search-bar">
+		        <input
+		            type="text"
+		            name="search"
+		            th:value="${searchQuery}"
+		            placeholder="Search by name, email, job, department…"
+		            class="search-input"
+		            aria-label="Search managers"
+		        />
+		        <button type="submit" class="btn-primary">Search</button>
+		        <a th:if="${searchQuery != ''}" th:href="@{/employees}" class="btn-link">Clear</a>
+		    </form>
+		    
         <div class="panel-heading">
             <div>
-                <p class="eyebrow">Page 2</p>
+				<!-- Replace the static eyebrow -->
+				<p class="eyebrow" th:text="${searchQuery != '' ? 'Search results for: ' + searchQuery : 'Employee master table'}">
+				    Employee master table
+				</p>
                 <h2>All Managers</h2>
             </div>
             <span class="subtle-text">Page <span th:text="${currentPage + 1}">1</span> of <span th:text="${totalPages}">1</span></span>
