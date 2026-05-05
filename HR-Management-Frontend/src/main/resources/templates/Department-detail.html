@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${department != null
+          ? department['departmentName'] + ' — Detail' : 'Department Detail'}">
+    Department Detail</title>
+  <link rel="stylesheet" th:href="@{/css/dept.css}"/>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <div th:if="${param.success}" class="alert alert-success">
+    <span th:text="${param.success[0]}"></span>
+  </div>
+  <div th:if="${param.error}" class="alert alert-error">
+    <span th:text="${param.error[0]}"></span>
+  </div>
+  <div th:if="${error}" class="alert alert-error">
+    <span th:text="${error}"></span>
+  </div>
+
+  <div class="back-row">
+    <a href="/departments" class="back-link">&#8592; Back to Departments</a>
+  </div>
+
+  <div th:if="${department != null}">
+
+    <div class="detail-header">
+      <h1 class="dept-name" th:text="${department['departmentName']}">Department</h1>
+      <p class="dept-address">
+        <span class="pin-icon">&#x1F4CD;</span>
+        <span th:text="${(department['locationStreet'] != null
+                          and department['locationStreet'] != ''
+                          ? department['locationStreet'] + ', ' : '')
+                        + (department['locationCity'] != null
+                          ? department['locationCity'] : '')
+                        + (department['locationState'] != null
+                          and department['locationState'] != ''
+                          ? ', ' + department['locationState'] : '')
+                        + (department['locationPostal'] != null
+                          and department['locationPostal'] != ''
+                          ? ' ' + department['locationPostal'] : '')}">
+        </span>
+      </p>
+    </div>
+
+    
+    <div class="section-card">
+      <h2 class="section-title">Salary Analytics</h2>
+      <div class="divider"></div>
+      <div class="analytics-row">
+
+        <div class="analytics-tile" th:if="${highestPaid != null}">
+          <div class="analytics-icon analytics-icon--green">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+              <polyline points="17 6 23 6 23 12"></polyline>
+            </svg>
+          </div>
+          <div class="analytics-info">
+            <p class="analytics-label">Highest Paid</p>
+            <p class="analytics-value"
+               th:text="'$' + ${#numbers.formatDecimal(
+                         highestPaid['salary'], 1, 'COMMA', 0, 'POINT')}">$0</p>
+            
+          </div>
+        </div>
+        <div class="analytics-tile" th:unless="${highestPaid != null}">
+          <div class="analytics-icon analytics-icon--green">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+              <polyline points="17 6 23 6 23 12"></polyline>
+            </svg>
+          </div>
+          <div class="analytics-info">
+            <p class="analytics-label">Highest Paid</p>
+            <p class="analytics-value analytics-value--muted">N/A</p>
+          </div>
+        </div>
+
+        <div class="analytics-tile" th:if="${lowestPaid != null}">
+          <div class="analytics-icon analytics-icon--orange">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+              <polyline points="17 18 23 18 23 12"></polyline>
+            </svg>
+          </div>
+          <div class="analytics-info">
+            <p class="analytics-label">Lowest Paid</p>
+            <p class="analytics-value"
+               th:text="'$' + ${#numbers.formatDecimal(
+                         lowestPaid['salary'], 1, 'COMMA', 0, 'POINT')}">$0</p>
+            
+          </div>
+        </div>
+        <div class="analytics-tile" th:unless="${lowestPaid != null}">
+          <div class="analytics-icon analytics-icon--orange">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+              <polyline points="17 18 23 18 23 12"></polyline>
+            </svg>
+          </div>
+          <div class="analytics-info">
+            <p class="analytics-label">Lowest Paid</p>
+            <p class="analytics-value analytics-value--muted">N/A</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+   
+    <div class="section-card">
+      <h2 class="section-title">Assigned Personnel</h2>
+      <div class="divider"></div>
+      <div class="table-card table-card--inner">
+        <table class="dept-table">
+          <thead>
+            <tr>
+              <th>Employee ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Job Title</th>
+             
+              <th>Hire Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:if="${#lists.isEmpty(employees)}">
+              <td colspan="6" class="empty-cell">
+                No employees assigned to this department.</td>
+            </tr>
+            <tr th:each="emp : ${employees}">
+              <td th:text="${emp['employeeId']}">—</td>
+              <td th:text="${emp['fullName']}">—</td>
+              <td class="muted" th:text="${emp['email']}">—</td>
+              <td th:text="${emp['jobTitle'] != null and emp['jobTitle'] != ''
+                             ? emp['jobTitle'] : '—'}">—</td>
+              
+              <td class="muted" th:text="${emp['hireDate']}">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    
+    <div class="detail-actions">
+      <a th:href="@{'/departments/' + ${department['departmentId']} + '/edit'}"
+         class="btn btn-outline">Edit Department</a>
+     
+      </form>
+    </div>
+
+  </div>
+
+</div>
+</body>
+</html>
